@@ -31,4 +31,32 @@ ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 # 6) Clean up
 # ---------------------------------------------------------------------
 RUN rm -rf /tmp/*
+
+# ---------------------------------------------------------------------
+# 7) Build Spike (RISC-V ISA Simulator)
+# ---------------------------------------------------------------------
+WORKDIR /tmp
+RUN git clone --depth 1 https://github.com/riscv-software-src/riscv-isa-sim.git && \
+    cd riscv-isa-sim && \
+    mkdir build && cd build && \
+    ../configure --prefix=/opt/riscv && \
+    make -j"$(nproc)" && make install && \
+    rm -rf /tmp/*
+
+# ---------------------------------------------------------------------
+# 8) Build Proxy Kernel (PK)
+# ---------------------------------------------------------------------
+WORKDIR /tmp
+RUN git clone --depth 1 https://github.com/riscv-software-src/riscv-pk.git && \
+    cd riscv-pk && \
+    mkdir build && cd build && \
+    ../configure --prefix=/opt/riscv --host=riscv64-unknown-elf && \
+    make -j"$(nproc)" && make install && \
+    rm -rf /tmp/*
+
+# ---------------------------------------------------------------------
+# 9) Final workspace
+# ---------------------------------------------------------------------
 WORKDIR /workspaces
+
+
