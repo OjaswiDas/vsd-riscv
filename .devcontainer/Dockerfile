@@ -42,15 +42,18 @@ ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 
 # --- Now build riscv-pk using the cross toolchain ---
 WORKDIR /tmp
-RUN git clone https://github.com/riscv/riscv-pk.git && \
-    cd riscv-pk && mkdir build && cd build && \
+RUN set -eux; \
+    export PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"; \
+    git clone https://github.com/riscv/riscv-pk.git; \
+    cd riscv-pk; mkdir -p build; cd build; \
     CC=riscv64-unknown-elf-gcc \
     CXX=riscv64-unknown-elf-g++ \
     AR=riscv64-unknown-elf-ar \
     RANLIB=riscv64-unknown-elf-ranlib \
     ../configure --prefix=/opt/riscv --host=riscv64-unknown-elf \
-      || { echo '--- pk config.log ---'; cat config.log || true; exit 1; } && \
-    make -j"$(nproc)" && make install
+      || { echo '--- pk config.log ---'; cat config.log || true; exit 1; }; \
+    make -j"$(nproc)" V=1; \
+    make install
     
 # Optional: clean
 RUN rm -rf /tmp/*
