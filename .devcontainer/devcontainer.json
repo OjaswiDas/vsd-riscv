@@ -1,20 +1,13 @@
 {
-  "name": "VSD RISC-V Toolchain",
-  "build": { "dockerfile": "Dockerfile" },
-  "remoteUser": "root",
+  "name": "VSD RISC-V Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.cpptools",
-        "ms-vscode.makefile-tools",
-        "ms-vscode.hexeditor"
+        "ms-vscode.cpptools"
       ]
     }
-  },
-  "containerEnv": {
-    "PATH": "/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${containerEnv:PATH}"
-  },
-  "postCreateCommand": "make -C samples hello-spike || true",
-  "hostRequirements": { "cpus": 2, "memory": "8gb" }
+  }
 }
-
