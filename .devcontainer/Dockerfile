@@ -16,10 +16,17 @@ RUN wget -q https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.
 ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 
 # Spike
+# --- Spike (riscv-isa-sim) ---
+# deps for Spike: dtc + libfdt (dtc provides headers, but install dev pkg too)
+RUN apt-get update && apt-get install -y device-tree-compiler libfdt-dev && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /tmp
 RUN git clone https://github.com/riscv/riscv-isa-sim.git && \
-    cd riscv-isa-sim && mkdir build && cd build && \
-    ../configure --prefix=/opt/riscv && make -j"$(nproc)" && make install
+    cd riscv-isa-sim && \
+    git submodule update --init --recursive && \
+    mkdir build && cd build && \
+    ../configure --prefix=/opt/riscv && \
+    make -j"$(nproc)" && make install
 
 # Proxy kernel (pk)
 WORKDIR /tmp
