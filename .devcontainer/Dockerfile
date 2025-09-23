@@ -21,7 +21,9 @@ RUN apt-get update && apt-get install -y \
     patch \
     zlib1g-dev \
     libexpat-dev \
-    pkg-config
+    pkg-config \
+    iverilog \
+    gtkwave
 
 # Clone and build riscv-gnu-toolchain
 WORKDIR /tmp
