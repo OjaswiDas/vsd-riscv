@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 0) Base build deps
+# Base dependencies
 RUN apt-get update && apt-get install -y \
     git curl wget ca-certificates vim \
     build-essential gcc g++ make pkg-config \
@@ -11,45 +11,41 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev libexpat1-dev \
     device-tree-compiler libfdt-dev \
     python3 iverilog gtkwave \
+    libpixman-1-dev libglib2.0-dev \
  && rm -rf /var/lib/apt/lists/*
 
 ARG MAKE_JOBS
 ENV MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+ENV RISCV=/opt/riscv
+ENV PATH="${RISCV}/bin:${PATH}"
 
-# 1) Sanity: host gcc must work
+# Sanity check
 RUN echo 'int main(){return 0;}' > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc
 
-# 2) riscv-gnu-toolchain (bare-metal newlib)
+# Build spike
+WORKDIR /tmp
+RUN git clone --depth 1 https://github.com/riscv/riscv-isa-sim.git && \
+    cd riscv-isa-sim && \
+    mkdir build && cd build && \
+    ../configure --prefix=${RISCV} && \
+    make -j"${MAKE_JOBS}" && make install && \
+    cd /tmp && rm -rf riscv-isa-sim
+
+# Build toolchain
 WORKDIR /tmp
 RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
     cd riscv-gnu-toolchain && \
-    git submodule update --init --recursive --depth 1 && \
     mkdir build && cd build && \
-    ../configure --prefix=/opt/riscv --with-arch=rv64imac --with-abi=lp64 && \
-    make -j"${MAKE_JOBS}" newlib
+    ../configure --prefix=${RISCV} --with-arch=rv64imac --with-abi=lp64 && \
+    make -j"${MAKE_JOBS}" newlib && \
+    cd /tmp && rm -rf riscv-gnu-toolchain
 
-ENV PATH="/opt/riscv/bin:${PATH}"
-
-# 3) Spike (host build)
-WORKDIR /tmp
-RUN git clone --depth 1 https://github.com/riscv/riscv-isa-sim.git && \
-    cd riscv-isa-sim && git submodule update --init --recursive && \
-    mkdir build && cd build && \
-    ../configure --prefix=/opt/riscv \
-      || { echo '--- spike config.log ---'; cat config.log || true; exit 1; } && \
-    make -j"${MAKE_JOBS}" && make install
-
-# 4) riscv-pk
+# Build riscv-pk
 WORKDIR /tmp
 RUN git clone --depth 1 https://github.com/riscv/riscv-pk.git && \
     cd riscv-pk && mkdir build && cd build && \
-    CC=riscv64-unknown-elf-gcc \
-    CXX=riscv64-unknown-elf-g++ \
-    AR=riscv64-unknown-elf-ar \
-    RANLIB=riscv64-unknown-elf-ranlib \
-    ../configure --prefix=/opt/riscv --host=riscv64-unknown-elf \
-      || { echo '--- pk config.log ---'; cat config.log || true; exit 1; } && \
-    make -j"${MAKE_JOBS}" && make install
+    ../configure --prefix=${RISCV} --host=riscv64-unknown-elf && \
+    make -j"${MAKE_JOBS}" && make install && \
+    cd /tmp && rm -rf riscv-pk
 
-RUN rm -rf /tmp/*
 WORKDIR /workspaces
