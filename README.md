@@ -1,6 +1,5 @@
 # vsd-riscv
 
-Got it. Here’s a **concise, student-friendly README** you can place in your repo (or share separately):
 
 ---
 
@@ -59,4 +58,3 @@ Sum from 1 to 9 is 45
 
 ---
 
-Would you like me to also prepare a **one-page PDF handout** version of this README for your students? That way they don’t even need to navigate the repo to read instructions.
