@@ -6,24 +6,14 @@ ENV RISCV=/opt/riscv
 
 # Install necessary build dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    git \
-    libtool \
-    autoconf \
-    automake \
-    libmpc-dev \
-    libmpfr-dev \
-    libgmp-dev \
-    gawk \
-    flex \
-    bison \
-    texinfo \
-    patch \
-    zlib1g-dev \
-    libexpat-dev \
-    pkg-config \
-    iverilog \
-    gtkwave
+    git curl wget ca-certificates vim \
+    build-essential gcc g++ make pkg-config \
+    autoconf automake autotools-dev libtool \
+    bison flex texinfo gperf patchutils \
+    gawk libmpc-dev libmpfr-dev libgmp-dev \
+    zlib1g-dev libexpat1-dev \
+    device-tree-compiler libfdt-dev \
+    python3 iverilog gtkwave
 
 # Clone and build riscv-gnu-toolchain
 WORKDIR /tmp
