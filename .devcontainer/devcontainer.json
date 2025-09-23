@@ -1,0 +1,19 @@
+{
+    "name": "RISC-V Toolchain",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/vim:1": {}
+    },
+    "postCreateCommand": "bash .devcontainer/setup.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.makefile-tools",
+                "github.codespaces"
+            ]
+        }
+    },
+    "remoteUser": "vscode"
+}
