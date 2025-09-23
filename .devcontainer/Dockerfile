@@ -44,9 +44,14 @@ ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 WORKDIR /tmp
 RUN git clone https://github.com/riscv/riscv-pk.git && \
     cd riscv-pk && mkdir build && cd build && \
-    ../configure --prefix=/opt/riscv --host=riscv64-unknown-elf || { echo '--- pk config.log ---'; cat config.log || true; exit 1; } && \
+    CC=riscv64-unknown-elf-gcc \
+    CXX=riscv64-unknown-elf-g++ \
+    AR=riscv64-unknown-elf-ar \
+    RANLIB=riscv64-unknown-elf-ranlib \
+    ../configure --prefix=/opt/riscv --host=riscv64-unknown-elf \
+      || { echo '--- pk config.log ---'; cat config.log || true; exit 1; } && \
     make -j"$(nproc)" && make install
-
+    
 # Optional: clean
 RUN rm -rf /tmp/*
 WORKDIR /workspaces
