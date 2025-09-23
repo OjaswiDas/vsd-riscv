@@ -19,7 +19,7 @@ ENV MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
 # 1) Sanity: host gcc must work
 RUN echo 'int main(){return 0;}' > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc
 
-# 3) riscv-gnu-toolchain (bare-metal newlib)
+# 2) riscv-gnu-toolchain (bare-metal newlib)
 WORKDIR /tmp
 RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
     cd riscv-gnu-toolchain && \
@@ -30,7 +30,7 @@ RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-to
 
 ENV PATH="/opt/riscv/bin:${PATH}"
 
-# 2) Spike (host build)
+# 3) Spike (host build)
 WORKDIR /tmp
 RUN git clone --depth 1 https://github.com/riscv/riscv-isa-sim.git && \
     cd riscv-isa-sim && git submodule update --init --recursive && \
