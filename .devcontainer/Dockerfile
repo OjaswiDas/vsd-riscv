@@ -1,10 +1,7 @@
-# Use a suitable base image, for example, a recent Ubuntu release
 FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Set environment variables for RISC-V installation path
-ENV RISCV=/opt/riscv
-
-# Install necessary build dependencies
+# 0) Base build deps
 RUN apt-get update && apt-get install -y \
     git curl wget ca-certificates vim \
     build-essential gcc g++ make pkg-config \
@@ -13,39 +10,25 @@ RUN apt-get update && apt-get install -y \
     gawk libmpc-dev libmpfr-dev libgmp-dev \
     zlib1g-dev libexpat1-dev \
     device-tree-compiler libfdt-dev \
-    python3 iverilog gtkwave
+    python3 iverilog gtkwave \
+ && rm -rf /var/lib/apt/lists/*
 
-# Clone and build riscv-gnu-toolchain
+ARG MAKE_JOBS
+ENV MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+
+# 1) Sanity: host gcc must work
+RUN echo 'int main(){return 0;}' > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc
+
+# 3) riscv-gnu-toolchain (bare-metal newlib)
 WORKDIR /tmp
-RUN git clone https://github.com/riscv-software-src/riscv-gnu-toolchain.git && \
+RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
     cd riscv-gnu-toolchain && \
-    ./configure --prefix=$RISCV --with-arch=rv64gc --with-abi=lp64d && \
-    make -j$(nproc) && \
-    make install
+    git submodule update --init --recursive --depth 1 && \
+    mkdir build && cd build && \
+    ../configure --prefix=/opt/riscv --with-arch=rv64imac --with-abi=lp64 && \
+    make -j"${MAKE_JOBS}" newlib
 
-# Clone and build Spike (RISC-V ISA Simulator)
-WORKDIR /tmp
-RUN git clone https://github.com/riscv-software-src/riscv-isa-sim.git && \
-    mkdir riscv-isa-sim/build && \
-    cd riscv-isa-sim/build && \
-    ../configure --prefix=$RISCV --with-varch=vlen:256,elen:64 --with-isa=rv64gcv --with-target=riscv64-unknown-elf && \
-    make -j$(nproc) && \
-    make install
+ENV PATH="/opt/riscv/bin:${PATH}"
 
-# Clone and build Proxy Kernel (PK)
-WORKDIR /tmp
-RUN git clone https://github.com/riscv-software-src/riscv-pk.git && \
-    mkdir riscv-pk/build && \
-    cd riscv-pk/build && \
-    ../configure --prefix=$RISCV --host=riscv64-unknown-elf && \
-    make -j$(nproc) && \
-    make install
-
-# Add RISC-V binaries to PATH
-ENV PATH=$PATH:$RISCV/bin:$RISCV/riscv64-unknown-elf/bin
-
-# Clean up build directories to reduce image size
 RUN rm -rf /tmp/*
-
-# Set default command (optional, can be adjusted based on usage)
-CMD ["bash"]
+WORKDIR /workspaces
