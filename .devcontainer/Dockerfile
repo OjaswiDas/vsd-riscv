@@ -1,7 +1,9 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 0) Base build deps
+# ---------------------------------------------------------------------
+# 1) Core build deps for host (must be first)
+# ---------------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     git curl wget ca-certificates vim \
     build-essential gcc g++ make pkg-config \
@@ -13,22 +15,20 @@ RUN apt-get update && apt-get install -y \
     python3 iverilog gtkwave \
  && rm -rf /var/lib/apt/lists/*
 
-ARG MAKE_JOBS
-ENV MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
+# ---------------------------------------------------------------------
+# 4) Install prebuilt RISC-V GCC toolchain (cross compiler)
+# ---------------------------------------------------------------------
+WORKDIR /opt
+RUN wget -q https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz \
+ && tar -xzf riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz \
+ && mv riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14 /opt/riscv \
+ && rm -f *.tar.gz
 
-# 1) Sanity: host gcc must work
-RUN echo 'int main(){return 0;}' > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc
+# Add both bin dirs to PATH (host + cross)
+ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 
-# 3) riscv-gnu-toolchain (bare-metal newlib)
-WORKDIR /tmp
-RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
-    cd riscv-gnu-toolchain && \
-    git submodule update --init --recursive --depth 1 && \
-    mkdir build && cd build && \
-    ../configure --prefix=/opt/riscv --with-arch=rv64imac --with-abi=lp64 && \
-    make -j"${MAKE_JOBS}" newlib
-
-ENV PATH="/opt/riscv/bin:${PATH}"
-
+# ---------------------------------------------------------------------
+# 6) Clean up
+# ---------------------------------------------------------------------
 RUN rm -rf /tmp/*
 WORKDIR /workspaces
