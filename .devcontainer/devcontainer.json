@@ -1,19 +1,19 @@
 {
-    "name": "RISC-V Toolchain",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
-    "features": {
-        "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/vim:1": {}
-    },
-    "postCreateCommand": "bash .devcontainer/setup.sh",
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-vscode.cpptools",
-                "ms-vscode.makefile-tools",
-                "github.codespaces"
-            ]
-        }
-    },
-    "remoteUser": "vscode"
+  "name": "VSD RISC-V Toolchain",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.makefile-tools",
+        "ms-vscode.hexeditor"
+      ]
+    }
+  },
+  "containerEnv": {
+    "PATH": "/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${containerEnv:PATH}"
+  },
+  "postCreateCommand": "make -C samples hello-spike || true",
+  "hostRequirements": { "cpus": 2, "memory": "8gb" }
 }
