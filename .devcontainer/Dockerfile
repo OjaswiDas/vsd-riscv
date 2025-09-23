@@ -19,15 +19,6 @@ ENV MAKE_JOBS=${MAKE_JOBS:-$(nproc)}
 # 1) Sanity: host gcc must work
 RUN echo 'int main(){return 0;}' > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc
 
-# 2) Spike (host build)
-WORKDIR /tmp
-RUN git clone --depth 1 https://github.com/riscv/riscv-isa-sim.git && \
-    cd riscv-isa-sim && git submodule update --init --recursive && \
-    mkdir build && cd build && \
-    ../configure --prefix=/opt/riscv \
-      || { echo '--- spike config.log ---'; cat config.log || true; exit 1; } && \
-    make -j"${MAKE_JOBS}" && make install
-
 # 3) riscv-gnu-toolchain (bare-metal newlib)
 WORKDIR /tmp
 RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-toolchain.git && \
@@ -38,6 +29,15 @@ RUN git clone --depth 1 --recursive https://github.com/riscv-collab/riscv-gnu-to
     make -j"${MAKE_JOBS}" newlib
 
 ENV PATH="/opt/riscv/bin:${PATH}"
+
+# 2) Spike (host build)
+WORKDIR /tmp
+RUN git clone --depth 1 https://github.com/riscv/riscv-isa-sim.git && \
+    cd riscv-isa-sim && git submodule update --init --recursive && \
+    mkdir build && cd build && \
+    ../configure --prefix=/opt/riscv \
+      || { echo '--- spike config.log ---'; cat config.log || true; exit 1; } && \
+    make -j"${MAKE_JOBS}" && make install
 
 # 4) riscv-pk
 WORKDIR /tmp
