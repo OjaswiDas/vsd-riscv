@@ -19,16 +19,18 @@ RUN apt-get update && apt-get install -y \
     xfce4 xfce4-terminal x11vnc xvfb novnc websockify supervisor dbus-x11 gedit vim \
  && rm -rf /var/lib/apt/lists/*
 
-# 2) Prebuilt SiFive toolchain (no PATH change yet)
+# 2) Host GCC sanity (force clean host PATH so cross tools can't interfere)
+RUN /usr/bin/env -i PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+    bash -lc 'echo "int main(){return 0;}" > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc'
+
+# 3) Prebuilt SiFive toolchain (no PATH change yet)
 WORKDIR /opt
 RUN wget -q https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz \
  && tar -xzf riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz \
  && mv riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14 /opt/riscv \
  && rm -f *.tar.gz
 
-# 3) Host GCC sanity (force clean host PATH so cross tools can't interfere)
-RUN /usr/bin/env -i PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
-    bash -lc 'echo "int main(){return 0;}" > /tmp/cc.c && gcc /tmp/cc.c -o /tmp/cc && /tmp/cc'
+
 
 # 4) Spike (host build) with CLEAN_PATH
 WORKDIR /tmp
