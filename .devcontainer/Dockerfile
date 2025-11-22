@@ -59,3 +59,10 @@ RUN set -eux; \
 ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 
 WORKDIR /workspaces
+# -----------------------------
+# noVNC desktop environment
+# -----------------------------
+COPY supervisord.conf /etc/supervisor/conf.d/vnc.conf
+
+EXPOSE 6080
+CMD ["/usr/bin/supervisord", "-n"]
