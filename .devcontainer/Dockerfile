@@ -1,5 +1,6 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY=:1
 
 # 1) Core deps
 RUN apt-get update && apt-get install -y \
@@ -13,6 +14,10 @@ RUN apt-get update && apt-get install -y \
     python3 iverilog gtkwave \
     # Spike deps
     libboost-regex-dev libboost-system-dev \
+        libx11-dev libxext-dev libxrender-dev libxpm-dev libxaw7-dev libcairo2-dev libfontconfig1-dev \
+    libreadline-dev libncurses-dev flex bison gawk tcsh \
+    python3 python3-pip pkg-config curl ca-certificates \
+    xfce4 xfce4-terminal x11vnc xvfb novnc websockify supervisor dbus-x11 gedit vim \
  && rm -rf /var/lib/apt/lists/*
 
 # 2) Prebuilt SiFive toolchain (no PATH change yet)
@@ -59,3 +64,10 @@ RUN set -eux; \
 ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 
 WORKDIR /workspaces
+# -----------------------------
+# noVNC desktop environment
+# -----------------------------
+COPY supervisord.conf /etc/supervisor/conf.d/vnc.conf
+
+EXPOSE 6080
+CMD ["/usr/bin/supervisord", "-n"]
