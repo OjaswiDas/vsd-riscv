@@ -58,7 +58,6 @@ RUN set -eux; \
 # 6) Finally, expose cross tools to users
 ENV PATH="/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin:${PATH}"
 
-WORKDIR /workspaces
 # -----------------------------
 # noVNC desktop environment
 # -----------------------------
