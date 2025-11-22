@@ -62,7 +62,12 @@ RUN set -eux; \
     rm -rf /tmp/*
 
 # 6) Finally, expose cross tools to users
-ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin"
+# ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin"
+
+# 7) Hard-reset PATH for all future shells
+RUN echo 'export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin"' \
+    > /etc/profile.d/00-reset-path.sh
+RUN chmod +x /etc/profile.d/00-reset-path.sh
 
 WORKDIR /workspaces
 # -----------------------------
