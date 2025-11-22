@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     gawk libmpc-dev libmpfr-dev libgmp-dev \
     zlib1g-dev libexpat1-dev \
     device-tree-compiler libfdt-dev \
-    python3 iverilog gtkwave \
+    python3 iverilog gtkwave gedit \
     # Spike deps
     libboost-regex-dev libboost-system-dev \
  && rm -rf /var/lib/apt/lists/*
