@@ -3,11 +3,16 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-vscode.cpptools"
-      ]
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": {
+      "label": "noVNC Desktop",
+      "onAutoForward": "openBrowser"
     }
+  },
+  "overrideCommand": false,
+  "remoteUser": "root",
+  "containerEnv": {
+    "DISPLAY": ":1"
   }
 }
