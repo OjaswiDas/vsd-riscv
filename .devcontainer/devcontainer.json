@@ -1,8 +1,6 @@
 {
-  "name": "VSD RISC-V Dev",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "name": "VSD RISC-V DEV",
+  "build": { "dockerfile": "Dockerfile" },
   "forwardPorts": [6080],
   "portsAttributes": {
     "6080": {
@@ -12,7 +10,6 @@
   },
   "overrideCommand": false,
   "remoteUser": "root",
-  "containerEnv": {
-    "DISPLAY": ":1"
-  }
+  "containerEnv": { "DISPLAY": ":1" },
+  "postStartCommand": "supervisord -c /etc/supervisor/conf.d/vnc.conf"
 }
