@@ -1,18 +1,13 @@
 {
-  "name": "VSD RISC-V DEV",
+  "name": "VSD RISC-V Dev",
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "forwardPorts": [6080],
-  "portsAttributes": {
-    "6080": {
-      "label": "noVNC Desktop",
-      "onAutoForward": "openBrowser"
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools"
+      ]
     }
-  },
-  "overrideCommand": false,
-  "remoteUser": "root",
-  "containerEnv": {
-    "DISPLAY": ":1"
   }
 }
