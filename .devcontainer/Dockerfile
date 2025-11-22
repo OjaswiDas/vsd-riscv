@@ -1,5 +1,6 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY=:1
 
 # 1) Core deps
 RUN apt-get update && apt-get install -y \
@@ -11,8 +12,10 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev libexpat1-dev \
     device-tree-compiler libfdt-dev \
     python3 iverilog gtkwave gedit \
-    # Spike deps
-    libboost-regex-dev libboost-system-dev \
+    python3 python3-pip pkg-config curl ca-certificates \
+    libx11-dev libxext-dev libxrender-dev libxpm-dev libxaw7-dev libcairo2-dev libfontconfig1-dev \
+ xfce4 xfce4-terminal x11vnc xvfb novnc websockify supervisor dbus-x11 \
+ libboost-regex-dev libboost-system-dev 
  && rm -rf /var/lib/apt/lists/*
 
 # 2) Prebuilt SiFive toolchain (no PATH change yet)
