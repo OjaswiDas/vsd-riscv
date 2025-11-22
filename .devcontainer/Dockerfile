@@ -60,11 +60,7 @@ RUN set -eux; \
     rm -rf /tmp/*
 
 # 6) Finally, expose cross tools to users
-ENV PATH="${PATH}:/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin"
-
-# 7) Ensure interactive shells always prefer system tools over RISC-V tools
-RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH' \
-    > /etc/profile.d/00-fix-path.sh
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/riscv/bin:/opt/riscv/riscv64-unknown-elf/bin"
 
 WORKDIR /workspaces
 # -----------------------------
